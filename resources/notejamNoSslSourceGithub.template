@@ -1,0 +1,1551 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "VPC": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "192.168.8.0/22",
+                "InstanceTenancy": "default",
+                "EnableDnsSupport": "true",
+                "EnableDnsHostnames": "false",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJamVPC"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "42a00d69-5035-43db-adb7-e2a80e426eea"
+                }
+            }
+        },
+        "subnetDb2b": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": "192.168.10.32/27",
+                "AvailabilityZone": "us-west-2b",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJam-DB-2B"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "36d3af5b-0cf5-424e-97f5-27d3611fd487"
+                }
+            }
+        },
+        "subnetDb2a": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": "192.168.10.0/27",
+                "AvailabilityZone": "us-west-2a",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJam-DB-2A"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "a1c58e00-bb41-4c09-8d1b-155d126089da"
+                }
+            }
+        },
+        "subnetElb2b": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": "192.168.9.32/27",
+                "AvailabilityZone": "us-west-2b",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJam-ELB-2B"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "78762e36-2074-4a44-a908-d5edbed4b0c8"
+                }
+            }
+        },
+        "subnetElb2a": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": "192.168.9.0/27",
+                "AvailabilityZone": "us-west-2a",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJam-ELB-2A"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "5a91dd92-f44b-450e-ab40-19be94baf3f6"
+                }
+            }
+        },
+        "subnetApp2b": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": "192.168.8.32/27",
+                "AvailabilityZone": "us-west-2b",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJam-APP-2B"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "595b780f-7da8-4e6c-be4f-d3f7e0881e7e"
+                }
+            }
+        },
+        "subnetApp2a": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": "192.168.8.0/27",
+                "AvailabilityZone": "us-west-2a",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "noteJam-APP-2A"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "735fd668-d877-48b5-a4f9-9ab8384e7ccb"
+                }
+            }
+        },
+        "noteJamRDS": {
+            "Type": "AWS::RDS::DBInstance",
+            "Properties": {
+                "AllocatedStorage": "5",
+                "AllowMajorVersionUpgrade": "false",
+                "AutoMinorVersionUpgrade": "true",
+                "MultiAZ": "true",
+                "DBInstanceClass": "db.t2.micro",
+                "Port": "3306",
+                "StorageType": "standard",
+                "BackupRetentionPeriod": "5",
+                "MasterUsername": "administrator",
+                "MasterUserPassword": "MyPassword",
+                "PreferredBackupWindow": "09:08-09:38",
+                "PreferredMaintenanceWindow": "wed:13:18-wed:13:48",
+                "DBName": "MyDatabase",
+                "Engine": "mysql",
+                "EngineVersion": "5.6.19a",
+                "LicenseModel": "general-public-license",
+                "DBSubnetGroupName": {
+                    "Ref": "notejamDbSubnetGroup"
+                },
+                "DBParameterGroupName": {
+                    "Ref": "DBPGnoteJam"
+                },
+                "VPCSecurityGroups": [
+                    {
+                        "Ref": "SGnoteJamDb"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "workload-type",
+                        "Value": "other"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "974db0e5-4d12-4050-8010-f67b83942dd0"
+                }
+            }
+        },
+        "notejamDbSubnetGroup": {
+            "Type": "AWS::RDS::DBSubnetGroup",
+            "Properties": {
+                "DBSubnetGroupDescription": "SUBG - noteJamDb ",
+                "SubnetIds": [
+                    {
+                        "Ref": "subnetDb2b"
+                    },
+                    {
+                        "Ref": "subnetDb2a"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "1fac7054-fe63-4df3-8c25-5f96e4ca143f"
+                }
+            }
+        },
+        "DBPGnoteJam": {
+            "Type": "AWS::RDS::DBParameterGroup",
+            "Properties": {
+                "Description": "noteJam Mysql parameter Group",
+                "Family": "mysql5.6",
+                "Parameters": {
+                    "binlog_cache_size": "32768",
+                    "binlog_format": "MIXED",
+                    "explicit_defaults_for_timestamp": "1",
+                    "innodb_buffer_pool_size": "{DBInstanceClassMemory*3/4}",
+                    "innodb_file_per_table": "1",
+                    "innodb_flush_method": "O_DIRECT"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "301a6755-7203-43e0-a269-9f88e432324e"
+                }
+            }
+        },
+        "SGnoteJamDb": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "SG-noteJam-DB",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "SG-HML-DB-1"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "4d55df44-2e00-4399-8c99-519cc10480e1"
+                }
+            }
+        },
+        "ingress1": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "SGnoteJamDb"
+                },
+                "IpProtocol": "tcp",
+                "FromPort": "3306",
+                "ToPort": "3306",
+                "CidrIp": "0.0.0.0/0"
+            }
+        },
+        "ingress2": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "SGnoteJamElb"
+                },
+                "IpProtocol": "-1",
+                "CidrIp": "0.0.0.0/0"
+            }
+        },
+        "ingress3": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "SGnoteJamApp"
+                },
+                "IpProtocol": "-1",
+                "CidrIp": "192.168.8.0/22"
+            }
+        },
+        "egress1": {
+            "Type": "AWS::EC2::SecurityGroupEgress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "SGnoteJamDb"
+                },
+                "IpProtocol": "-1",
+                "CidrIp": "0.0.0.0/0"
+            }
+        },
+        "egress2": {
+            "Type": "AWS::EC2::SecurityGroupEgress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "SGnoteJamElb"
+                },
+                "IpProtocol": "-1",
+                "CidrIp": "0.0.0.0/0"
+            }
+        },
+        "egress3": {
+            "Type": "AWS::EC2::SecurityGroupEgress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "SGnoteJamApp"
+                },
+                "IpProtocol": "-1",
+                "CidrIp": "0.0.0.0/0"
+            }
+        },
+        "EC2RT4JQ0D": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "e7ac353e-738d-4a65-9544-b6803c2fa33f"
+                }
+            }
+        },
+        "EC2SRTA4B2EG": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "EC2RT4JQ0D"
+                },
+                "SubnetId": {
+                    "Ref": "subnetElb2b"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "e2669855-15cf-46c5-93a5-14dca2a6069c"
+                }
+            }
+        },
+        "EC2IG39C7X": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "154d2939-e3d2-4426-9809-00d992fd1f01"
+                }
+            }
+        },
+        "EC2VPCG4MOXG": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "InternetGatewayId": {
+                    "Ref": "EC2IG39C7X"
+                },
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "486ac7b8-568f-499c-b614-8050f353d9a8"
+                }
+            }
+        },
+        "EC2RRSRX": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "EC2RT4JQ0D"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "EC2IG39C7X"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "5375f325-dc26-4514-bc28-8fd358ad34b0"
+                }
+            },
+            "DependsOn": [
+                "EC2IG39C7X"
+            ]
+        },
+        "EC2SRTA1D8EN": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "EC2RT4JQ0D"
+                },
+                "SubnetId": {
+                    "Ref": "subnetElb2a"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "e7dbeab5-9452-4761-b90b-9b7fd46aba2f"
+                }
+            }
+        },
+        "EBA3YI9G": {
+            "Type": "AWS::ElasticBeanstalk::Application",
+            "Properties": {
+                "ApplicationName": "NoteJam"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "b9a4c786-0aaa-47b6-8846-0038951104f9"
+                }
+            }
+        },
+        "versionSampleApplication13": {
+            "Type": "AWS::ElasticBeanstalk::ApplicationVersion",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "EBA3YI9G"
+                },
+                "Description": "Version 1.0",
+                "SourceBundle": {
+                    "S3Bucket": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                "elasticbeanstalk-samples",
+                                {
+                                    "Ref": "AWS::Region"
+                                }
+                            ]
+                        ]
+                    },
+                    "S3Key": "python-sample-20150402.zip"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "b3dd65e6-9971-492d-8844-9ac4a128fb68"
+                }
+            }
+        },
+        "EBE4KHU2": {
+            "Type": "AWS::ElasticBeanstalk::Environment",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "EBA3YI9G"
+                },
+                "SolutionStackName": "64bit Amazon Linux 2016.09 v2.3.3 running Python 3.4",
+                "VersionLabel": {
+                    "Ref": "versionSampleApplication13"
+                },
+                "Tier": {
+                    "Name": "WebServer",
+                    "Type": "Standard",
+                    "Version": " "
+                },
+                "OptionSettings": [
+                    {
+                        "Namespace": "aws:autoscaling:launchconfiguration",
+                        "OptionName": "IamInstanceProfile",
+                        "Value": "aws-elasticbeanstalk-ec2-role"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:launchconfiguration",
+                        "OptionName": "ImageId",
+                        "Value": "ami-49fa6c29"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:launchconfiguration",
+                        "OptionName": "InstanceType",
+                        "Value": "t1.micro"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:launchconfiguration",
+                        "OptionName": "SecurityGroups",
+                        "Value": {
+                            "Ref": "SGnoteJamApp"
+                        }
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:trigger",
+                        "OptionName": "UpperThreshold",
+                        "Value": "6000000"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+                        "OptionName": "MaxBatchSize",
+                        "Value": "1"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+                        "OptionName": "MinInstancesInService",
+                        "Value": "1"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+                        "OptionName": "RollingUpdateEnabled",
+                        "Value": "true"
+                    },
+                    {
+                        "Namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+                        "OptionName": "RollingUpdateType",
+                        "Value": "Health"
+                    },
+                    {
+                        "Namespace": "aws:ec2:vpc",
+                        "OptionName": "AssociatePublicIpAddress",
+                        "Value": "true"
+                    },
+                    {
+                        "Namespace": "aws:ec2:vpc",
+                        "OptionName": "ELBSubnets",
+                        "Value": {
+                            "Fn::Join": [
+                                ",",
+                                [
+                                    {
+                                        "Ref": "subnetElb2b"
+                                    },
+                                    {
+                                        "Ref": "subnetElb2a"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Namespace": "aws:ec2:vpc",
+                        "OptionName": "Subnets",
+                        "Value": {
+                            "Fn::Join": [
+                                ",",
+                                [
+                                    {
+                                        "Ref": "subnetApp2a"
+                                    },
+                                    {
+                                        "Ref": "subnetApp2b"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Namespace": "aws:ec2:vpc",
+                        "OptionName": "VPCId",
+                        "Value": {
+                            "Ref": "VPC"
+                        }
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:cloudwatch:logs",
+                        "OptionName": "DeleteOnTerminate",
+                        "Value": "true"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:cloudwatch:logs",
+                        "OptionName": "RetentionInDays",
+                        "Value": "3"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:cloudwatch:logs",
+                        "OptionName": "StreamLogs",
+                        "Value": "true"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:container:python",
+                        "OptionName": "StaticFiles",
+                        "Value": "/static/=static_files/"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:container:python",
+                        "OptionName": "WSGIPath",
+                        "Value": "notejam/wsgi.py"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:container:python:staticfiles",
+                        "OptionName": "/static/",
+                        "Value": "static_files/"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:application:environment",
+                        "OptionName": "RDS_HOSTNAME",
+                        "Value": {
+                            "Fn::GetAtt": [
+                                "noteJamRDS",
+                                "Endpoint.Address"
+                            ]
+                        }
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:application:environment",
+                        "OptionName": "RDS_DB_NAME",
+                        "Value": "MyDatabase"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:application:environment",
+                        "OptionName": "RDS_PASSWORD",
+                        "Value": "MyPassword"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:application:environment",
+                        "OptionName": "RDS_USERNAME",
+                        "Value": "administrator"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:command",
+                        "OptionName": "DeploymentPolicy",
+                        "Value": "Rolling"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:environment",
+                        "OptionName": "ServiceRole",
+                        "Value": "aws-elasticbeanstalk-service-role"
+                    },
+                    {
+                        "Namespace": "aws:elasticbeanstalk:healthreporting:system",
+                        "OptionName": "SystemType",
+                        "Value": "enhanced"
+                    },
+                    {
+                        "Namespace": "aws:elb:healthcheck",
+                        "OptionName": "Interval",
+                        "Value": "10"
+                    },
+                    {
+                        "Namespace": "aws:elb:loadbalancer",
+                        "OptionName": "CrossZone",
+                        "Value": "true"
+                    },
+                    {
+                        "Namespace": "aws:elb:loadbalancer",
+                        "OptionName": "LoadBalancerHTTPPort",
+                        "Value": "80"
+                    },
+                    {
+                        "Namespace": "aws:elb:loadbalancer",
+                        "OptionName": "SecurityGroups",
+                        "Value": {
+                            "Ref": "SGnoteJamElb"
+                        }
+                    },
+                    {
+                        "Namespace": "aws:elb:policies",
+                        "OptionName": "Stickiness Cookie Expiration",
+                        "Value": "18000"
+                    },
+                    {
+                        "Namespace": "aws:elb:policies",
+                        "OptionName": "Stickiness Policy",
+                        "Value": "true"
+                    },
+                    {
+                        "Namespace": "aws:elb:policies",
+                        "OptionName": "ConnectionDrainingEnabled",
+                        "Value": "true"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "7fbcf5de-3d45-4169-a891-85b02d842964"
+                }
+            }
+        },
+        "SGnoteJamApp": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "SG-noteJam-App",
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "50d1cde9-fa04-4c3b-979a-1e42063d7ba0"
+                }
+            }
+        },
+        "SGnoteJamElb": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "SG-noteJam-ELB",
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "56ff501c-58fc-45b5-ba54-27c3276a366e"
+                }
+            }
+        },
+        "EC2SRTA3JPPY": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "EC2RT4JQ0D"
+                },
+                "SubnetId": {
+                    "Ref": "subnetApp2b"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "80e8fb1e-d569-496e-a68b-78ca2a8fe550"
+                }
+            }
+        },
+        "EC2SRTARG9E": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "EC2RT4JQ0D"
+                },
+                "SubnetId": {
+                    "Ref": "subnetApp2a"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "936151c1-7b43-47bd-826d-ff5b719a822a"
+                }
+            }
+        },
+        "NoteJamBucket": {
+            "Properties": {
+                "AccessControl": "Private",
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
+                }
+            },
+            "Type": "AWS::S3::Bucket",
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "9b924f68-9744-45b9-9dc1-40acc0132b6e"
+                }
+            }
+        },
+        "CodeBuildNoteJam": {
+            "Type": "AWS::CodeBuild::Project",
+            "DependsOn": [
+                "CodeBuildRole",
+                "NoteJamBucket"
+            ],
+            "Properties": {
+                "Name": "NoteJam_CF",
+                "Description": "Test Nodejam App",
+                "ServiceRole": {
+                    "Fn::GetAtt": [
+                        "CodeBuildRole",
+                        "Arn"
+                    ]
+                },
+                "Artifacts": {
+                    "NamespaceType": "NONE",
+                    "Packaging": "ZIP",
+                    "Type": "S3",
+                    "Location": {
+                        "Ref": "NoteJamBucket"
+                    },
+                    "Name": "notejam_tst_out.zip"
+                },
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "Image": "aws/codebuild/python:3.4.5",
+                    "Type": "LINUX_CONTAINER"
+                },
+                "Source": {
+                    "Type": "S3",
+                    "Location": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:s3:::",
+                                {
+                                    "Ref": "NoteJamBucket"
+                                },
+                                "/notejam_tst.zip"
+                            ]
+                        ]
+                    }
+                },
+                "TimeoutInMinutes": 10,
+                "Tags": []
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "35aaa81b-0aa6-4f13-969a-99612c350b8e"
+                }
+            }
+        },
+        "CodeBuildRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "codebuild.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "codebuild-service",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "*",
+                                    "Resource": "*"
+                                }
+                            ],
+                            "Version": "2012-10-17"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "cfbaa12d-8b26-4d2e-9792-af36a1658801"
+                }
+            }
+        },
+        "CodePipelineStack": {
+            "Type": "AWS::CodePipeline::Pipeline",
+            "Properties": {
+                "RoleArn": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "arn:aws:iam::",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            ":role/",
+                            {
+                                "Ref": "CodePipelineRole"
+                            }
+                        ]
+                    ]
+                },
+                "Stages": [
+                    {
+                        "Name": "Source",
+                        "Actions": [
+                            {
+                                "InputArtifacts": [],
+                                "Name": "Source",
+                                "ActionTypeId": {
+                                    "Category": "Source",
+                                    "Owner": "ThirdParty",
+                                    "Version": "1",
+                                    "Provider": "GitHub"
+                                },
+                                "OutputArtifacts": [
+                                    {
+                                        "Name": "MyApp"
+                                    }
+                                ],
+                                "Configuration": {
+                                    "Owner": "fecotex",
+                                    "Repo": "noteJam-fecotex",
+                                    "Branch": "master",
+                                    "OAuthToken": "****"
+                                },
+                                "RunOrder": 1
+                            }
+                        ]
+                    },
+                    {
+                        "Name": "TestApp",
+                        "Actions": [
+                            {
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "MyApp"
+                                    }
+                                ],
+                                "Name": "Build",
+                                "ActionTypeId": {
+                                    "Category": "Build",
+                                    "Owner": "AWS",
+                                    "Version": "1",
+                                    "Provider": "CodeBuild"
+                                },
+                                "OutputArtifacts": [
+                                    {
+                                        "Name": "MyApp2"
+                                    }
+                                ],
+                                "Configuration": {
+                                    "ProjectName": {
+                                        "Ref": "CodeBuildNoteJam"
+                                    }
+                                },
+                                "RunOrder": 1
+                            }
+                        ]
+                    },
+                    {
+                        "Name": "Deploy",
+                        "Actions": [
+                            {
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "MyApp"
+                                    }
+                                ],
+                                "Name": {
+                                    "Ref": "EBA3YI9G"
+                                },
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Version": "1",
+                                    "Provider": "ElasticBeanstalk"
+                                },
+                                "OutputArtifacts": [],
+                                "Configuration": {
+                                    "ApplicationName": {
+                                        "Ref": "EBA3YI9G"
+                                    },
+                                    "EnvironmentName": {
+                                        "Ref": "EBE4KHU2"
+                                    }
+                                },
+                                "RunOrder": 1
+                            }
+                        ]
+                    }
+                ],
+                "ArtifactStore": {
+                    "Type": "S3",
+                    "Location": "codepipeline-us-west-2-252175784422"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "6978d001-fd49-410d-a20f-133d1b2b7a32"
+                }
+            }
+        },
+        "CodePipelineRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "codepipeline.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "codepipeline-service",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "codecommit:GetBranch",
+                                        "codecommit:GetCommit",
+                                        "codecommit:UploadArchive",
+                                        "codecommit:GetUploadArchiveStatus",
+                                        "codecommit:CancelUploadArchive",
+                                        "codebuild:*"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "s3:GetObject",
+                                        "s3:GetObjectVersion",
+                                        "s3:GetBucketVersioning"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:s3:::codepipeline*",
+                                        "arn:aws:s3:::elasticbeanstalk*"
+                                    ],
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "codedeploy:CreateDeployment",
+                                        "codedeploy:GetApplicationRevision",
+                                        "codedeploy:GetDeployment",
+                                        "codedeploy:GetDeploymentConfig",
+                                        "codedeploy:RegisterApplicationRevision"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "elasticbeanstalk:*",
+                                        "ec2:*",
+                                        "elasticloadbalancing:*",
+                                        "autoscaling:*",
+                                        "cloudwatch:*",
+                                        "s3:*",
+                                        "sns:*",
+                                        "cloudformation:*",
+                                        "rds:*",
+                                        "sqs:*",
+                                        "ecs:*",
+                                        "iam:PassRole"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:GetLogEvents",
+                                        "logs:PutLogEvents",
+                                        "logs:DescribeLogGroups",
+                                        "logs:DescribeLogStreams",
+                                        "logs:PutRetentionPolicy"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "lambda:InvokeFunction",
+                                        "lambda:ListFunctions"
+                                    ],
+                                    "Resource": "*",
+                                    "Effect": "Allow"
+                                }
+                            ],
+                            "Version": "2012-10-17"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "021edecf-4e30-40d0-be1f-c46f0d2ff7b1"
+                }
+            }
+        }
+    },
+    "Description": "cloudformer 2",
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "301a6755-7203-43e0-a269-9f88e432324e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1210,
+                    "y": 960
+                },
+                "z": 3,
+                "parent": "1fac7054-fe63-4df3-8c25-5f96e4ca143f",
+                "embeds": []
+            },
+            "42a00d69-5035-43db-adb7-e2a80e426eea": {
+                "size": {
+                    "width": 950,
+                    "height": 1000
+                },
+                "position": {
+                    "x": 410,
+                    "y": 350
+                },
+                "z": 1,
+                "embeds": [
+                    "56ff501c-58fc-45b5-ba54-27c3276a366e",
+                    "50d1cde9-fa04-4c3b-979a-1e42063d7ba0",
+                    "4d55df44-2e00-4399-8c99-519cc10480e1",
+                    "735fd668-d877-48b5-a4f9-9ab8384e7ccb",
+                    "595b780f-7da8-4e6c-be4f-d3f7e0881e7e",
+                    "5a91dd92-f44b-450e-ab40-19be94baf3f6",
+                    "78762e36-2074-4a44-a908-d5edbed4b0c8",
+                    "a1c58e00-bb41-4c09-8d1b-155d126089da",
+                    "36d3af5b-0cf5-424e-97f5-27d3611fd487",
+                    "e7ac353e-738d-4a65-9544-b6803c2fa33f",
+                    "1fac7054-fe63-4df3-8c25-5f96e4ca143f",
+                    "b9a4c786-0aaa-47b6-8846-0038951104f9"
+                ]
+            },
+            "4d55df44-2e00-4399-8c99-519cc10480e1": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 940,
+                    "y": 1070
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "a1c58e00-bb41-4c09-8d1b-155d126089da": {
+                "size": {
+                    "width": 150,
+                    "height": 150
+                },
+                "position": {
+                    "x": 1190,
+                    "y": 1190
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "36d3af5b-0cf5-424e-97f5-27d3611fd487": {
+                "size": {
+                    "width": 150,
+                    "height": 150
+                },
+                "position": {
+                    "x": 1030,
+                    "y": 1190
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "1fac7054-fe63-4df3-8c25-5f96e4ca143f": {
+                "size": {
+                    "width": 240,
+                    "height": 240
+                },
+                "position": {
+                    "x": 1060,
+                    "y": 900
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": [
+                    "301a6755-7203-43e0-a269-9f88e432324e",
+                    "974db0e5-4d12-4050-8010-f67b83942dd0"
+                ],
+                "isconnectedto": [
+                    "36d3af5b-0cf5-424e-97f5-27d3611fd487",
+                    "a1c58e00-bb41-4c09-8d1b-155d126089da"
+                ]
+            },
+            "974db0e5-4d12-4050-8010-f67b83942dd0": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1090,
+                    "y": 960
+                },
+                "z": 3,
+                "parent": "1fac7054-fe63-4df3-8c25-5f96e4ca143f",
+                "embeds": [],
+                "ismemberof": [
+                    "4d55df44-2e00-4399-8c99-519cc10480e1",
+                    "301a6755-7203-43e0-a269-9f88e432324e"
+                ]
+            },
+            "735fd668-d877-48b5-a4f9-9ab8384e7ccb": {
+                "size": {
+                    "width": 150,
+                    "height": 150
+                },
+                "position": {
+                    "x": 730,
+                    "y": 580
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "595b780f-7da8-4e6c-be4f-d3f7e0881e7e": {
+                "size": {
+                    "width": 150,
+                    "height": 150
+                },
+                "position": {
+                    "x": 730,
+                    "y": 390
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "5a91dd92-f44b-450e-ab40-19be94baf3f6": {
+                "size": {
+                    "width": 150,
+                    "height": 150
+                },
+                "position": {
+                    "x": 740,
+                    "y": 1180
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "78762e36-2074-4a44-a908-d5edbed4b0c8": {
+                "size": {
+                    "width": 150,
+                    "height": 150
+                },
+                "position": {
+                    "x": 730,
+                    "y": 1000
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "e7ac353e-738d-4a65-9544-b6803c2fa33f": {
+                "size": {
+                    "width": 220,
+                    "height": 220
+                },
+                "position": {
+                    "x": 440,
+                    "y": 740
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": [
+                    "5375f325-dc26-4514-bc28-8fd358ad34b0"
+                ]
+            },
+            "e2669855-15cf-46c5-93a5-14dca2a6069c": {
+                "source": {
+                    "id": "e7ac353e-738d-4a65-9544-b6803c2fa33f"
+                },
+                "target": {
+                    "id": "78762e36-2074-4a44-a908-d5edbed4b0c8"
+                },
+                "z": 2
+            },
+            "154d2939-e3d2-4426-9809-00d992fd1f01": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 140,
+                    "y": 850
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "486ac7b8-568f-499c-b614-8050f353d9a8": {
+                "source": {
+                    "id": "154d2939-e3d2-4426-9809-00d992fd1f01"
+                },
+                "target": {
+                    "id": "42a00d69-5035-43db-adb7-e2a80e426eea"
+                },
+                "z": 1
+            },
+            "5375f325-dc26-4514-bc28-8fd358ad34b0": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 520,
+                    "y": 810
+                },
+                "z": 3,
+                "parent": "e7ac353e-738d-4a65-9544-b6803c2fa33f",
+                "embeds": [],
+                "references": [
+                    "154d2939-e3d2-4426-9809-00d992fd1f01"
+                ],
+                "dependson": [
+                    "154d2939-e3d2-4426-9809-00d992fd1f01"
+                ]
+            },
+            "0a23ee47-66a4-4531-b9f6-dfae532b5154": {
+                "source": {
+                    "id": "5375f325-dc26-4514-bc28-8fd358ad34b0"
+                },
+                "target": {
+                    "id": "154d2939-e3d2-4426-9809-00d992fd1f01"
+                },
+                "z": 5
+            },
+            "7bc6751f-9d3f-403f-ad8b-af75bb083e23": {
+                "source": {
+                    "id": "5375f325-dc26-4514-bc28-8fd358ad34b0"
+                },
+                "target": {
+                    "id": "154d2939-e3d2-4426-9809-00d992fd1f01"
+                },
+                "z": 6
+            },
+            "e7dbeab5-9452-4761-b90b-9b7fd46aba2f": {
+                "source": {
+                    "id": "e7ac353e-738d-4a65-9544-b6803c2fa33f"
+                },
+                "target": {
+                    "id": "5a91dd92-f44b-450e-ab40-19be94baf3f6"
+                },
+                "z": 2
+            },
+            "b9a4c786-0aaa-47b6-8846-0038951104f9": {
+                "size": {
+                    "width": 240,
+                    "height": 210
+                },
+                "position": {
+                    "x": 970,
+                    "y": 500
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": [
+                    "b3dd65e6-9971-492d-8844-9ac4a128fb68",
+                    "7fbcf5de-3d45-4169-a891-85b02d842964"
+                ]
+            },
+            "7fbcf5de-3d45-4169-a891-85b02d842964": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1050,
+                    "y": 550
+                },
+                "z": 3,
+                "parent": "b9a4c786-0aaa-47b6-8846-0038951104f9",
+                "embeds": [],
+                "isrelatedto": [
+                    "50d1cde9-fa04-4c3b-979a-1e42063d7ba0",
+                    "78762e36-2074-4a44-a908-d5edbed4b0c8",
+                    "5a91dd92-f44b-450e-ab40-19be94baf3f6",
+                    "735fd668-d877-48b5-a4f9-9ab8384e7ccb",
+                    "595b780f-7da8-4e6c-be4f-d3f7e0881e7e",
+                    "42a00d69-5035-43db-adb7-e2a80e426eea",
+                    "56ff501c-58fc-45b5-ba54-27c3276a366e",
+                    "b3dd65e6-9971-492d-8844-9ac4a128fb68",
+                    "974db0e5-4d12-4050-8010-f67b83942dd0"
+                ]
+            },
+            "50d1cde9-fa04-4c3b-979a-1e42063d7ba0": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1290,
+                    "y": 580
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "56ff501c-58fc-45b5-ba54-27c3276a366e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1290,
+                    "y": 490
+                },
+                "z": 2,
+                "parent": "42a00d69-5035-43db-adb7-e2a80e426eea",
+                "embeds": []
+            },
+            "80e8fb1e-d569-496e-a68b-78ca2a8fe550": {
+                "source": {
+                    "id": "e7ac353e-738d-4a65-9544-b6803c2fa33f"
+                },
+                "target": {
+                    "id": "595b780f-7da8-4e6c-be4f-d3f7e0881e7e"
+                },
+                "z": 2
+            },
+            "936151c1-7b43-47bd-826d-ff5b719a822a": {
+                "source": {
+                    "id": "e7ac353e-738d-4a65-9544-b6803c2fa33f"
+                },
+                "target": {
+                    "id": "735fd668-d877-48b5-a4f9-9ab8384e7ccb"
+                },
+                "z": 2
+            },
+            "b3dd65e6-9971-492d-8844-9ac4a128fb68": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1120,
+                    "y": 630
+                },
+                "z": 3,
+                "parent": "b9a4c786-0aaa-47b6-8846-0038951104f9",
+                "embeds": []
+            },
+            "60af5142-650e-4606-b182-e22ec61c2a2e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 420,
+                    "y": 960
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "5574cfbb-3599-47f7-b285-b8cada2d88bc": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -420,
+                    "y": 1120
+                },
+                "z": 0
+            },
+            "cfbaa12d-8b26-4d2e-9792-af36a1658801": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 600,
+                    "y": 210
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "35aaa81b-0aa6-4f13-969a-99612c350b8e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 700,
+                    "y": 210
+                },
+                "z": 1,
+                "embeds": [],
+                "dependson": [
+                    "cfbaa12d-8b26-4d2e-9792-af36a1658801",
+                    "9b924f68-9744-45b9-9dc1-40acc0132b6e"
+                ],
+                "isrelatedto": [
+                    "cfbaa12d-8b26-4d2e-9792-af36a1658801",
+                    "9b924f68-9744-45b9-9dc1-40acc0132b6e"
+                ]
+            },
+            "dbdae221-ed6e-492b-9077-48b9b63a1430": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -90,
+                    "y": 80
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "e65fc63a-0de8-47f9-80b8-4e7d547b56a3": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -130,
+                    "y": 210
+                },
+                "z": 0
+            },
+            "021edecf-4e30-40d0-be1f-c46f0d2ff7b1": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 810,
+                    "y": 210
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "6978d001-fd49-410d-a20f-133d1b2b7a32": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 930,
+                    "y": 210
+                },
+                "z": 1,
+                "embeds": [],
+                "isrelatedto": [
+                    "021edecf-4e30-40d0-be1f-c46f0d2ff7b1",
+                    "35aaa81b-0aa6-4f13-969a-99612c350b8e",
+                    "b9a4c786-0aaa-47b6-8846-0038951104f9",
+                    "7fbcf5de-3d45-4169-a891-85b02d842964"
+                ]
+            },
+            "9b924f68-9744-45b9-9dc1-40acc0132b6e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 1050,
+                    "y": 200
+                },
+                "z": 1,
+                "embeds": []
+            }
+        }
+    }
+}
