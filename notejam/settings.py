@@ -4,8 +4,6 @@ import sys
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 ALLOWED_HOSTS = ['*']
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
-SECURE_SSL_REDIRECT = True
 
 PROJECT_DIR = "{}/../".format(os.path.dirname(__file__))
 
@@ -26,6 +24,9 @@ if 'test' not in sys.argv:
             'PORT': '3306',
         } 
     }
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    SECURE_SSL_REDIRECT = True
 
 else: 
     DATABASES = {
